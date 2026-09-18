@@ -66,7 +66,13 @@ async function startDownload() {
 
 async function applyUpdate() {
   if (!desktopBridge) return
-  await desktopBridge.applyUpdate()
+  try {
+    await desktopBridge.applyUpdate()
+    // 成功路径：应用退出并由新版本接管，不会走到这里
+  } catch {
+    // 主进程已把具体原因写入 updateState.error（如 macOS「App 管理」权限引导），刷新显示
+    await refreshUpdateState()
+  }
 }
 
 onMounted(() => {
